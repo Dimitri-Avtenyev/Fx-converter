@@ -3,8 +3,12 @@ namespace Fx_converter
 {
     public class Startup
     {
-        public void ConfigureServices(IServiceCollection services) { 
+        public void ConfigureServices(IServiceCollection services) {
 
+            services.AddControllers();
+            //services.AddScoped<IFileHandlerService, FileHandlerService>;
+            services.AddSwaggerGen();
+            var connectionString = "";
         }
 
         [Obsolete]

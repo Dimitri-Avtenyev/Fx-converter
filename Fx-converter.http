@@ -1,0 +1,6 @@
+@Fx_converter_HostAddress = http://localhost:5086
+
+GET {{Fx_converter_HostAddress}}/uploadfile/
+Accept: application/json
+
+###

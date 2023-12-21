@@ -30,21 +30,16 @@ namespace Fx_converter.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int?>("ObservationId")
-                        .HasColumnType("int");
-
                     b.Property<string>("Symbol")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ObservationId");
-
                     b.ToTable("Currencies");
                 });
 
-            modelBuilder.Entity("Fx_converter.Models.Observation", b =>
+            modelBuilder.Entity("Fx_converter.Models.CurrencyRate", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -55,6 +50,32 @@ namespace Fx_converter.Migrations
                     b.Property<int>("CurrencyId")
                         .HasColumnType("int");
 
+                    b.Property<int>("ObservationId")
+                        .HasColumnType("int");
+
+                    b.Property<double>("Rate")
+                        .HasColumnType("float");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CurrencyId");
+
+                    b.HasIndex("ObservationId");
+
+                    b.ToTable("CurrencyRates");
+                });
+
+            modelBuilder.Entity("Fx_converter.Models.Observation", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("CurrencyRateId")
+                        .HasColumnType("int");
+
                     b.Property<DateTime>("Date")
                         .HasColumnType("datetime2");
 
@@ -63,16 +84,26 @@ namespace Fx_converter.Migrations
                     b.ToTable("Observations");
                 });
 
-            modelBuilder.Entity("Fx_converter.Models.Currency", b =>
+            modelBuilder.Entity("Fx_converter.Models.CurrencyRate", b =>
                 {
+                    b.HasOne("Fx_converter.Models.Currency", "Currency")
+                        .WithMany()
+                        .HasForeignKey("CurrencyId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("Fx_converter.Models.Observation", null)
-                        .WithMany("Currency")
-                        .HasForeignKey("ObservationId");
+                        .WithMany("CurrencyRates")
+                        .HasForeignKey("ObservationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Currency");
                 });
 
             modelBuilder.Entity("Fx_converter.Models.Observation", b =>
                 {
-                    b.Navigation("Currency");
+                    b.Navigation("CurrencyRates");
                 });
 #pragma warning restore 612, 618
         }

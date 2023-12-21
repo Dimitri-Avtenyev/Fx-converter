@@ -4,7 +4,7 @@
     {
         public int Id { get; set; }
         public DateTime Date { get; set; }
-        public List<Currency> Currency { get; set; }
-        public int CurrencyId { get; set; }
+        public List<CurrencyRate> CurrencyRates { get; set; }
+        public int CurrencyRateId { get; set; }
     }
 }

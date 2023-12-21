@@ -6,6 +6,7 @@ namespace Fx_converter.Entities
     public class FxDbContext : DbContext
     {
         public DbSet<Currency> Currencies { get; set; }
+        public DbSet<CurrencyRate> CurrencyRates { get; set; }
         public DbSet<Observation> Observations { get; set; }
         public FxDbContext(DbContextOptions options) : base(options)
         {

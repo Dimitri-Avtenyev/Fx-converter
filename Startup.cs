@@ -9,7 +9,8 @@ namespace Fx_converter
         public void ConfigureServices(IServiceCollection services) {
 
             services.AddControllers();
-            //services.AddScoped<IFileHandlerService, FileHandlerService>;
+            //services.AddScoped<IFileHandler, FileHandler>;
+            //services.Addscoped<iFxData, FxData>;
             services.AddSwaggerGen();
             var USER = Environment.GetEnvironmentVariable("USER");
             var PSW = Environment.GetEnvironmentVariable("PSW");

@@ -1,4 +1,7 @@
 ﻿
+using Fx_converter.Entities;
+using Microsoft.EntityFrameworkCore;
+
 namespace Fx_converter
 {
     public class Startup
@@ -8,10 +11,15 @@ namespace Fx_converter
             services.AddControllers();
             //services.AddScoped<IFileHandlerService, FileHandlerService>;
             services.AddSwaggerGen();
-            var connectionString = "";
+            var USER = Environment.GetEnvironmentVariable("USER");
+            var PSW = Environment.GetEnvironmentVariable("PSW");
+            var connectionString = $"Server=tcp:fxconverterdb-server.database.windows.net,1433;Initial Catalog=FxConverterDB;Persist Security Info=False;User ID={USER};Password={PSW};MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;";
+            services.AddDbContext<FxDbContext>(options => {
+                options.UseSqlServer(connectionString);
+            });
         }
 
-        [Obsolete]
+
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             if (env.IsDevelopment()) {

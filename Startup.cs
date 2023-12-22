@@ -7,7 +7,6 @@ namespace Fx_converter
 {
     public class Startup
     {
-        // remove async
         public void ConfigureServices(IServiceCollection services) {
 
             services.AddControllers();
@@ -39,11 +38,11 @@ namespace Fx_converter
                 {
                     ExceptionHandler = async context => await context.Response.WriteAsJsonAsync(new { error = "Something went wrong." })
                 });
-                app.UseRouting();
-                app.UseEndpoints(endpoints => {
-                    endpoints.MapControllers();
-                });
             }
+            app.UseRouting();
+            app.UseEndpoints(endpoints => {
+                endpoints.MapControllers();
+            });
         }
 
 

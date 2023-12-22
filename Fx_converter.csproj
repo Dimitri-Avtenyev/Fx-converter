@@ -6,6 +6,7 @@
 	  <InvariantGlobalization>false</InvariantGlobalization>
     <ImplicitUsings>enable</ImplicitUsings>
     <RootNamespace>Fx_converter</RootNamespace>
+    <UserSecretsId>e8f94ee5-b32c-4d5f-ae47-d054e9db1a20</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
@@ -20,7 +21,8 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
-    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
+    <PackageReference Include="Swashbuckle.AspNetCore.Annotations" Version="6.5.0" />
+    <PackageReference Include="Swashbuckle.AspNetCore.SwaggerUI" Version="6.5.0" />
   </ItemGroup>
 
   <ItemGroup>

@@ -1,6 +1,7 @@
 ﻿using Fx_converter.Models;
 using Newtonsoft.Json;
 
+
 namespace Fx_converter.Services.DataCollector
 {
     public class DataCollector : IDataCollector
@@ -8,22 +9,43 @@ namespace Fx_converter.Services.DataCollector
         public string EntryPointUrl { get; set; } = "https://data-api.ecb.europa.eu/service/data/EXR/D..EUR.SP00.A";
         public Observation Observation { get; set; }
  
-
-        public async Task<Observation> GetRates(DateTime startDate, DateTime? endDate) {
-            DateTime startPeriod = new DateTime();
-            DateTime endPeriod = new DateTime();
+       
+        public async Task<Observation> GetRates(DateTime startDate) {
+            string startPeriod = String.Empty;
+            string endPeriod = String.Empty;
             startDate = this.WeekDayCheckAndAdjust(startDate);
 
-            if (!endDate.HasValue) {
-                endPeriod = startDate;
-            }
+            startPeriod = startDate.ToString("yyy-MM-dd");
+            endPeriod = startDate.ToString("yyy-MM-dd");
             using (var client = new HttpClient()) {
-                string url = $"{EntryPointUrl}?startPeriod={startPeriod}&endPeriod={endPeriod}&detail=dataonly";
+
+                string url = $"{EntryPointUrl}?startPeriod={startPeriod}&endPeriod={endPeriod}&format=jsondata&detail=dataonly";
+                var response = await client.GetAsync(url);
+                response.EnsureSuccessStatusCode();
+                var result = await response.Content.ReadAsStringAsync();
+                // interface/class for json data?
+                //Observation observation = JsonConvert.DeserializeObject<Observation>(result);
+                var json = JsonConvert.DeserializeObject<CurrencyData>(result);
+                Console.WriteLine(json.DataSets[0].Series.Observations["0:0:0:0:0"]);
+                Observation observation = null;
+                return observation;
+            }
+        }
+        public async Task<Observation> GetRates(DateTime startDate, DateTime endDate) {
+            string startPeriod = String.Empty;
+            string endPeriod = String.Empty;
+            startDate = this.WeekDayCheckAndAdjust(startDate);
+
+            startPeriod = startDate.ToString("yyy-MM-dd");
+            endPeriod = endDate.ToString("yyyy-MM-dd");
+            using (var client = new HttpClient()) {
+
+                string url = $"{EntryPointUrl}?startPeriod={startPeriod}&endPeriod={endPeriod}&format=jsondata&detail=dataonly";
                 var response = await client.GetAsync(url);
                 var result = await response.Content.ReadAsStringAsync();
                 // interface/class for json data?
                 //Observation observation = JsonConvert.DeserializeObject<Observation>(result);
-                var json = JsonConvert.DeserializeObject(result);
+                var json = JsonConvert.DeserializeObject<CurrencyData>(result);
                 Console.WriteLine(json);
                 Observation observation = null;
                 return observation;
@@ -36,7 +58,6 @@ namespace Fx_converter.Services.DataCollector
             if(this.AtLeastOneDayOlder(date)) {
                 Console.WriteLine($"{date} is too recent(needs to be at least one day older), no data yet, adjusting...");
             }
-            date = date.AddDays(-1);
             if (dayOfWeek == DayOfWeek.Sunday) {
                 date = date.AddDays(-2);
             } else if (dayOfWeek == DayOfWeek.Saturday) {
@@ -51,6 +72,7 @@ namespace Fx_converter.Services.DataCollector
 
             return timeDiff.TotalMilliseconds > DAY_IN_MILLISECONDS;
         }
+
     }
 
 }

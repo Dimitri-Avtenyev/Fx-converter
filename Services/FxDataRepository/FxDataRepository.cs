@@ -3,10 +3,10 @@ using Fx_converter.Models;
 
 namespace Fx_converter
 {
-    public class FxData :IFxData
+    public class FxDataRepository : IFxDataRepository
     {
         private readonly FxDbContext _context;
-        public FxData(FxDbContext context) {
+        public FxDataRepository(FxDbContext context) {
             _context = context;
         }
         public void Add(Observation observation) {
@@ -15,7 +15,7 @@ namespace Fx_converter
         }
 
         public Observation Get(DateTime date) {
-            
+            // if obs is null -> fetch + add and return
             return _context.Observations.FirstOrDefault(x => x.Date == date);
         }
 

@@ -1,6 +1,7 @@
 ﻿
 using Fx_converter.Entities;
 using Fx_converter.Services.DataCollector;
+using Fx_converter.Services.ExcelProcessor;
 using Microsoft.EntityFrameworkCore;
 
 namespace Fx_converter
@@ -10,8 +11,10 @@ namespace Fx_converter
         public void ConfigureServices(IServiceCollection services) {
 
             services.AddControllers();
-            //services.AddScoped<IFileHandler, FileHandler>;
-            //services.Addscoped<iFxData, FxData>;
+            services.AddHttpClient();
+            services.AddScoped<IDataCollector, DataCollector>();
+            services.AddScoped<IExcelProcessor, ExcelProcessor>();
+            services.AddScoped<IFxDataRepository, FxDataRepository>();
             services.AddSwaggerGen();
 
             var USER = Environment.GetEnvironmentVariable("USER");

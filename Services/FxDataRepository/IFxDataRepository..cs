@@ -2,7 +2,7 @@
 
 namespace Fx_converter
 {
-    public interface IFxData
+    public interface IFxDataRepository
     {
         Observation Get(DateTime date);
         IEnumerable<Observation> GetAll();

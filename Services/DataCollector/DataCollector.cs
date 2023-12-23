@@ -6,6 +6,10 @@ namespace Fx_converter.Services.DataCollector
 {
     public class DataCollector : IDataCollector
     {
+        public DataCollector(IHttpClientFactory httpClient) {
+            _httpClient = httpClient;
+        }
+        private readonly IHttpClientFactory _httpClient;
         public string EntryPointUrl { get; set; } = "https://data-api.ecb.europa.eu/service/data/EXR/D..EUR.SP00.A";
         public Observation Observation { get; set; }
  
@@ -17,7 +21,7 @@ namespace Fx_converter.Services.DataCollector
 
             startPeriod = startDate.ToString("yyy-MM-dd");
             endPeriod = startDate.ToString("yyy-MM-dd");
-            using (var client = new HttpClient()) {
+            using (var client = _httpClient.CreateClient()) {
 
                 string url = $"{EntryPointUrl}?startPeriod={startPeriod}&endPeriod={endPeriod}&format=jsondata&detail=dataonly";
                 var response = await client.GetAsync(url);

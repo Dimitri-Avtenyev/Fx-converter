@@ -3,16 +3,17 @@
     public static class Env
     {
         public static void Load(string path) {
-            if(!File.Exists(path)) {
+            if (!File.Exists(path)) {
                 return;
             }
             foreach (var line in File.ReadAllLines(path)) {
-                var lines = line.Split("=", StringSplitOptions.RemoveEmptyEntries);
-                if (lines.Length != 2) {
+                var results = line.Split("=", StringSplitOptions.RemoveEmptyEntries);
+                if (results.Length != 2) {
                     continue;
                 }
-                Environment.SetEnvironmentVariable(lines[0], lines[1]);
+                Environment.SetEnvironmentVariable(results[0], results[1]);
             }
+
         }
     }
 }

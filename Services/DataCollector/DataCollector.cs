@@ -31,7 +31,16 @@ namespace Fx_converter.Services.DataCollector
                 //Observation observation = JsonConvert.DeserializeObject<Observation>(result);
                 var json = JsonConvert.DeserializeObject<CurrencyData>(result);
                 Console.WriteLine(json.DataSets[0].Series.Observations["0:0:0:0:0"]);
-                Observation observation = null;
+                // dummy obj
+                Observation observation = new Observation();
+                observation.Date = new DateTime(2023, 12, 20);
+                observation.CurrencyRates = new List<CurrencyRate> {
+                    new CurrencyRate { 
+                        Id = 1, 
+                        Currency = new Currency { Id = 1, Symbol = "USD" }, 
+                        Rate = 1.0944, 
+                        ObservationId = 101 },
+                    };
                 return observation;
             }
         }

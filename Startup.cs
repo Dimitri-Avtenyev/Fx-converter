@@ -1,4 +1,5 @@
 ﻿
+using ClosedXML.Excel;
 using Fx_converter.Entities;
 using Fx_converter.Services.DataCollector;
 using Fx_converter.Services.ExcelProcessor;
@@ -13,7 +14,6 @@ namespace Fx_converter
             services.AddControllers();
             services.AddHttpClient();
             services.AddScoped<IDataCollector, DataCollector>();
-            services.AddScoped<IExcelProcessor, ExcelProcessor>();
             services.AddScoped<IFxDataRepository, FxDataRepository>();
             services.AddSwaggerGen();
 

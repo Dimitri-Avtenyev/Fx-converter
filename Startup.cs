@@ -13,6 +13,7 @@ namespace Fx_converter
 
 			services.AddControllers();
 			services.AddHttpClient();
+			services.AddScoped<IExcelProcessor, ExcelProcessor>();
 			services.AddScoped<IDataCollector, DataCollector>();
 			services.AddScoped<IFxDataRepository, FxDataRepository>();
 			services.AddSwaggerGen();

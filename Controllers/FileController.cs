@@ -7,6 +7,11 @@ namespace Fx_converter.Controllers
 	[Route("uploadfile")]
 	public class FileController : Controller
 	{
+		public FileController(IExcelProcessor excelProcessor) {
+			_excelProcessor = excelProcessor;	
+		}
+		private readonly IExcelProcessor _excelProcessor;
+
 		[HttpPost]
 		public async Task<IActionResult> HandleUploadedFile(IFormFile file) {
 			if (file == null || file.Length == 0) {
@@ -18,21 +23,10 @@ namespace Fx_converter.Controllers
 
 			try {
 				// demo exammple using ClosedXML package
-				using (var stream = file.OpenReadStream())
-				using (var workbook = new XLWorkbook(stream)) {
-					ExcelProcessor excelProcessor = new ExcelProcessor(workbook);
-					IXLWorkbook processedWorkbook = await excelProcessor.Process();
-					// Save the modified content back to a MemoryStream
-					using (var modifiedStream = new MemoryStream()) {
-						processedWorkbook.SaveAs(modifiedStream);
-						// Convert the MemoryStream to a byte array
-						byte[] modifiedFile = modifiedStream.ToArray();
-
-						// Return the modified file with the correct content type
-						return File(modifiedFile, file.ContentType, file.FileName);
-					}
+				using (var stream = file.OpenReadStream()) {
+					byte[] modifiedFile = _excelProcessor.Process(stream);
+					return File(modifiedFile, file.ContentType, file.FileName);
 				}
-
 			} catch (Exception ex) {
 				Console.WriteLine(ex);
 				return StatusCode(500, "Internal server error");

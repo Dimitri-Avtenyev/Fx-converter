@@ -4,9 +4,9 @@ namespace Fx_converter.Services.ExcelProcessor
 {
 	public interface IExcelProcessor
 	{
-		Task<IXLWorkbook> Process();
-		void AddData(IXLWorksheet worksheet); 
+		byte[] Process(Stream filestream);
+		void AddData(IXLWorksheet worksheet, string columnLetter, IXLColumns cols); 
 		string? FindColumnWithCurrency(IXLWorksheet worksheet);
-		public void AddColumns(IXLWorksheet worksheet, string columnLetter); 
+		IXLColumns AddColumns(IXLWorksheet worksheet, string columnLetter); 
 	}
 }

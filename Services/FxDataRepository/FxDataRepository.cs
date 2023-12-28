@@ -19,7 +19,7 @@ namespace Fx_converter
             _context.SaveChanges();
         }
         public async Task<Observation> GetAsync(DateTime date) {
-            var observation = _context.Observations.FirstOrDefault(x => x.Date == date);
+            var observation = _context.Observations.FirstOrDefault(o => o.Date == date.ToString("yyyy-MM-dd"));
 			if (observation == null) {
 				observation =  await _dataCollector.GetRates(date);
                 Add(observation);
@@ -37,7 +37,7 @@ namespace Fx_converter
         }
 
         public async Task Update(Observation observation) {
-            Observation updatedObservation = await GetAsync(observation.Date);
+            Observation updatedObservation = await GetAsync(DateTime.Parse(observation.Date));
             if (updatedObservation != null) {
                 observation.Date = updatedObservation.Date; 
                 observation.CurrencyRates = updatedObservation.CurrencyRates;

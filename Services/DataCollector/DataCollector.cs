@@ -1,4 +1,6 @@
-﻿using Fx_converter.Models;
+﻿using DocumentFormat.OpenXml.Drawing.Charts;
+using Fx_converter.Entities;
+using Fx_converter.Models;
 using Newtonsoft.Json;
 
 
@@ -6,10 +8,12 @@ namespace Fx_converter.Services.DataCollector
 {
     public class DataCollector : IDataCollector
     {
-        public DataCollector(IHttpClientFactory httpClient) {
+        public DataCollector(IHttpClientFactory httpClient, FxDbContext context) {
             _httpClient = httpClient;
+            _context = context;
         }
         private readonly IHttpClientFactory _httpClient;
+        private readonly FxDbContext _context;
         public string EntryPointUrl { get; set; } = "https://data-api.ecb.europa.eu/service/data/EXR/D..EUR.SP00.A";
         public Observation Observation { get; set; }
  
@@ -19,24 +23,31 @@ namespace Fx_converter.Services.DataCollector
             string endPeriod = String.Empty;
             startDate = this.WeekDayCheckAndAdjust(startDate);
 
-            startPeriod = startDate.ToString("yyy-MM-dd");
-            endPeriod = startDate.ToString("yyy-MM-dd");
+            startPeriod = startDate.ToString("yyyy-MM-dd");
+            endPeriod = startDate.ToString("yyyy-MM-dd");
             using (var client = _httpClient.CreateClient()) {
 
                 string url = $"{EntryPointUrl}?startPeriod={startPeriod}&endPeriod={endPeriod}&format=jsondata&detail=dataonly";
-            /*    var response = await client.GetAsync(url);
-                response.EnsureSuccessStatusCode();
-                var result = await response.Content.ReadAsStringAsync();
-                // interface/class for json data?
-                //Observation observation = JsonConvert.DeserializeObject<Observation>(result);
-                var json = JsonConvert.DeserializeObject<CurrencyData>(result);*/
+                /*    var response = await client.GetAsync(url);
+                    response.EnsureSuccessStatusCode();
+                    var result = await response.Content.ReadAsStringAsync();
+                    // interface/class for json data?
+                    //Observation observation = JsonConvert.DeserializeObject<Observation>(result);
+                    var json = JsonConvert.DeserializeObject<CurrencyData>(result);*/
                 // dummy obj
-                Observation observation = new Observation();
-                observation.Date = new DateTime(2023, 12, 20);
+                // in method
+                        List<Currency> currencies = _context.Currencies.ToList();
+                        Currency currency = currencies.FirstOrDefault(c => c.Symbol == "USD");
+                        if (currency == null) {
+                            currency = new Currency() { Symbol = "USD" };
+                        }
+                //
+				Observation observation = new Observation();
+                observation.Date = "2023-12-19";
                 observation.CurrencyRates = new List<CurrencyRate> {
                     new CurrencyRate { 
-                        Currency = new Currency { Symbol = "USD" }, 
-                        Rate = 1.0944, },
+                        Currency = currency,
+                        Rate = 1.0044, },
                     };
                 return observation;
             }

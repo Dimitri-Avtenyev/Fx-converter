@@ -22,9 +22,8 @@ namespace Fx_converter.Controllers
 			}
 
 			try {
-				// demo exammple using ClosedXML package
 				using (var stream = file.OpenReadStream()) {
-					byte[] modifiedFile = _excelProcessor.Process(stream);
+					byte[] modifiedFile = await _excelProcessor.Process(stream);
 					return File(modifiedFile, file.ContentType, file.FileName);
 				}
 			} catch (Exception ex) {

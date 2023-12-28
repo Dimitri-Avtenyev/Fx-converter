@@ -32,9 +32,12 @@ namespace Fx_converter.Migrations
 
                     b.Property<string>("Symbol")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("Symbol")
+                        .IsUnique();
 
                     b.ToTable("Currencies");
                 });
@@ -81,6 +84,9 @@ namespace Fx_converter.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("Date")
+                        .IsUnique();
+
                     b.ToTable("Observations");
                 });
 
@@ -92,13 +98,15 @@ namespace Fx_converter.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Fx_converter.Models.Observation", null)
+                    b.HasOne("Fx_converter.Models.Observation", "Observation")
                         .WithMany("CurrencyRates")
                         .HasForeignKey("ObservationId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Currency");
+
+                    b.Navigation("Observation");
                 });
 
             modelBuilder.Entity("Fx_converter.Models.Observation", b =>

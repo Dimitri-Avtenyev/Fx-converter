@@ -4,10 +4,10 @@ namespace Fx_converter
 {
     public interface IFxDataRepository
     {
-        Observation Get(DateTime date);
+        Task<Observation> GetAsync(DateTime date);
         IEnumerable<Observation> GetAll();
         void Add(Observation observation);
-        void Update(Observation observation);
+        Task Update(Observation observation);
         void Remove(Observation observation);
     }
 }

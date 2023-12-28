@@ -24,22 +24,19 @@ namespace Fx_converter.Services.DataCollector
             using (var client = _httpClient.CreateClient()) {
 
                 string url = $"{EntryPointUrl}?startPeriod={startPeriod}&endPeriod={endPeriod}&format=jsondata&detail=dataonly";
-                var response = await client.GetAsync(url);
+            /*    var response = await client.GetAsync(url);
                 response.EnsureSuccessStatusCode();
                 var result = await response.Content.ReadAsStringAsync();
                 // interface/class for json data?
                 //Observation observation = JsonConvert.DeserializeObject<Observation>(result);
-                var json = JsonConvert.DeserializeObject<CurrencyData>(result);
-                Console.WriteLine(json.DataSets[0].Series.Observations["0:0:0:0:0"]);
+                var json = JsonConvert.DeserializeObject<CurrencyData>(result);*/
                 // dummy obj
                 Observation observation = new Observation();
                 observation.Date = new DateTime(2023, 12, 20);
                 observation.CurrencyRates = new List<CurrencyRate> {
                     new CurrencyRate { 
-                        Id = 1, 
-                        Currency = new Currency { Id = 1, Symbol = "USD" }, 
-                        Rate = 1.0944, 
-                        ObservationId = 101 },
+                        Currency = new Currency { Symbol = "USD" }, 
+                        Rate = 1.0944, },
                     };
                 return observation;
             }

@@ -7,4 +7,5 @@
         public List<CurrencyRate> CurrencyRates { get; set; }
         public int CurrencyRateId { get; set; }
     }
+
 }

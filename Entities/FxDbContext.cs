@@ -12,5 +12,14 @@ namespace Fx_converter.Entities
         {
 
         }
-    }
+		protected override void OnModelCreating(ModelBuilder modelBuilder) {
+            modelBuilder.Entity<Currency>()
+                .HasIndex(c => c.Symbol)
+                .IsUnique();
+            modelBuilder.Entity<Observation>()
+                .HasIndex(o => o.Date)
+                .IsUnique();
+			base.OnModelCreating(modelBuilder);
+		}
+	}
 }

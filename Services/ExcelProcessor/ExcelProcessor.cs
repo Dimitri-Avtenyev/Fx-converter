@@ -1,22 +1,23 @@
 ﻿
 using ClosedXML.Excel;
-using DocumentFormat.OpenXml.Spreadsheet;
-using DocumentFormat.OpenXml.Wordprocessing;
 
 namespace Fx_converter.Services.ExcelProcessor
 {
 	public class ExcelProcessor : IExcelProcessor
 	{
-		public byte[] Process(Stream filestream) {
+		public ExcelProcessor(IFxDataRepository fxDataRepository) {
+			_fxDataRepository = fxDataRepository;
+		}
+		private readonly IFxDataRepository _fxDataRepository;
+		public async Task<byte[]> Process(Stream filestream) {
 			using (var workbook = new XLWorkbook(filestream)) {
-				// placeholder return unprocessed
+
 				foreach (var worksheet in workbook.Worksheets) {
 					var columnCurrency = FindColumnWithCurrency(worksheet);
 
 					if (columnCurrency != null) {
-						IXLColumns cols = AddColumns(worksheet, columnCurrency);
-						AddData(worksheet, columnCurrency, cols);
-						//_workbook.Save();
+						int[] cols = AddColumns(worksheet, columnCurrency);
+						await AddData(worksheet, columnCurrency, cols);
 					}
 				}
 				using (var modifiedStream = new MemoryStream()) {
@@ -25,21 +26,23 @@ namespace Fx_converter.Services.ExcelProcessor
 				}
 			}
 		}
-		public void AddData(IXLWorksheet worksheet, string columnCurrency, IXLColumns cols) {
-		
-			foreach (var currencyCell in worksheet.Cells(columnCurrency)) {
-				var currentRow = worksheet.Row(currencyCell.Address.RowNumber);
-				var rowCells = currentRow.CellsUsed();
+		public async Task AddData(IXLWorksheet worksheet, string columnCurrency, int[] newCols) {
 
-				foreach(var rowCell in rowCells) {
+			foreach (var currencyCell in worksheet.Column(columnCurrency).CellsUsed()) {
+				/*var currentRow = worksheet.Row(currencyCell.Address.RowNumber);*/
+				var currentRow = currencyCell.WorksheetRow();
+
+				foreach(var rowCell in currentRow.CellsUsed()) {
 					if (rowCell.Value.IsDateTime) {
 						DateTime invoiceDate = rowCell.Value.GetDateTime();
-
-						if(currencyCell.Value.ToString().ToUpper() == "EUR") {
-							
-							currentRow.Cell("L").Value = 1;
+						string symbol = currencyCell.Value.ToString().ToUpper();
+						if(symbol == "EUR") {
+							currentRow.Cell(newCols[0]).Value = 1;
+						} else {
+							var observation = await _fxDataRepository.GetAsync(invoiceDate);
+							var currencyRate = observation.CurrencyRates.FirstOrDefault(currencyRate => currencyRate.Currency.Symbol == symbol);
+							currentRow.Cell(newCols[0]).Value = currencyRate.Rate;
 						}
-						
 					}
 				}
             }
@@ -56,21 +59,15 @@ namespace Fx_converter.Services.ExcelProcessor
 			return currencyColumn;
 		}
 
-		public IXLColumns AddColumns(IXLWorksheet worksheet, string columnLetter) {
+		public int[] AddColumns(IXLWorksheet worksheet, string columnLetter) {
 			var columnCurrencyIndex = XLHelper.GetColumnNumberFromLetter(columnLetter);
 			// new columns shift 2 spaces
 			var columnExchangeRate = XLHelper.GetColumnNumberFromLetter(columnLetter) + 2;
 			var columnConversion = columnExchangeRate + 1;
 			var addressRefValue = worksheet.Column(columnLetter).CellsUsed().First().Value.ToString();
 			// add 2 columns for ExchangeRate and for Conversion
-			var newColumns = worksheet.Column(columnCurrencyIndex + 1).InsertColumnsAfter(2);
-			IXLAddress firstAddedCol;
-			IXLAddress secondAddedCol;
-			foreach (var col in newColumns) {
-				var rangeAddress = col.RangeAddress;
-				firstAddedCol = rangeAddress.FirstAddress;
-				secondAddedCol = rangeAddress.LastAddress;
-			}
+			int[] newColumns = [columnExchangeRate, columnConversion];
+
 			// add headers to new columns
 			foreach (var cell in worksheet.Column(columnLetter).CellsUsed()) {
 				if (cell.Value.IsText && cell.Value.ToString() == addressRefValue) {

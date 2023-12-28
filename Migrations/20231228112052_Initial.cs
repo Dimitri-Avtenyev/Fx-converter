@@ -17,7 +17,7 @@ namespace Fx_converter.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Symbol = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    Symbol = table.Column<string>(type: "nvarchar(450)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -66,6 +66,12 @@ namespace Fx_converter.Migrations
                 });
 
             migrationBuilder.CreateIndex(
+                name: "IX_Currencies_Symbol",
+                table: "Currencies",
+                column: "Symbol",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
                 name: "IX_CurrencyRates_CurrencyId",
                 table: "CurrencyRates",
                 column: "CurrencyId");
@@ -74,6 +80,12 @@ namespace Fx_converter.Migrations
                 name: "IX_CurrencyRates_ObservationId",
                 table: "CurrencyRates",
                 column: "ObservationId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Observations_Date",
+                table: "Observations",
+                column: "Date",
+                unique: true);
         }
 
         /// <inheritdoc />

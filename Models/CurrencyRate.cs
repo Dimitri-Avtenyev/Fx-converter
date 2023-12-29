@@ -9,5 +9,4 @@
         public int ObservationId { get; set; }
 		public Observation Observation { get; set; }
 	}
-
 }

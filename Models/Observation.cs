@@ -4,7 +4,7 @@
     {
         public int Id { get; set; }
         public string Date { get; set; } //ISO yyyy-MM-dd
-        public List<CurrencyRate> CurrencyRates { get; set; }
+        public List<CurrencyRate> CurrencyRates { get; set; } = new List<CurrencyRate>();
     }
 
 }

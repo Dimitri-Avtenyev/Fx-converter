@@ -29,7 +29,6 @@ namespace Fx_converter.Services.ExcelProcessor
 		public async Task AddData(IXLWorksheet worksheet, string columnCurrency, int[] newCols) {
 
 			foreach (var currencyCell in worksheet.Column(columnCurrency).CellsUsed()) {
-				/*var currentRow = worksheet.Row(currencyCell.Address.RowNumber);*/
 				var currentRow = currencyCell.WorksheetRow();
 
 				foreach(var rowCell in currentRow.CellsUsed()) {

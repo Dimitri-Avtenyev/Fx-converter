@@ -1,6 +1,7 @@
 using Fx_converter.Entities;
 using Fx_converter.Models;
 using Fx_converter.Services.DataCollector;
+using Microsoft.EntityFrameworkCore;
 
 namespace Fx_converter
 {
@@ -19,7 +20,10 @@ namespace Fx_converter
             _context.SaveChanges();
         }
         public async Task<Observation> GetAsync(DateTime date) {
-            var observation = _context.Observations.FirstOrDefault(o => o.Date == date.ToString("yyyy-MM-dd"));
+            var observation = _context.Observations
+                .Include(o => o.CurrencyRates)
+                .ThenInclude(cr => cr.Currency)
+                .FirstOrDefault(o => o.Date == date.ToString("yyyy-MM-dd"));
 			if (observation == null) {
 				observation =  await _dataCollector.GetRates(date);
                 Add(observation);

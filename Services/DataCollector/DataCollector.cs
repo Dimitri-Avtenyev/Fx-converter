@@ -18,8 +18,8 @@ namespace Fx_converter.Services.DataCollector
  
        
         public async Task<Observation> GetRates(DateTime startDate) {
-            string startPeriod = String.Empty;
-            string endPeriod = String.Empty;
+            string startPeriod = string.Empty;
+            string endPeriod = string.Empty;
             startDate = this.WeekDayCheckAndAdjust(startDate);
 
             startPeriod = startDate.ToString("yyyy-MM-dd");
@@ -30,44 +30,15 @@ namespace Fx_converter.Services.DataCollector
                 var response = await client.GetAsync(url);
                 response.EnsureSuccessStatusCode();
                 var result = await response.Content.ReadAsStringAsync();
-                // interface/class for json data?
-                //Observation observation = JsonConvert.DeserializeObject<Observation>(result);
                 var data = JsonConvert.DeserializeObject<CurrencyData>(result);
            
-
-                Currency currency = GetOrCreateCurrency("USD");
-                //
-		/*		Observation observation = new Observation();
-                observation.Date = "2023-12-19";
-                observation.CurrencyRates = new List<CurrencyRate> {
-                    new CurrencyRate { 
-                        Currency = currency,
-                        Rate = 1.0044, },
-                    };*/
-
-                Observation observation = ObservationObjectBuilder(data);
+                Observation? observation = ObservationObjectBuilder(data);
                 return observation;
             }
         }
-        public async Task<Observation> GetRates(DateTime startDate, DateTime endDate) {
-            string startPeriod = String.Empty;
-            string endPeriod = String.Empty;
-            startDate = this.WeekDayCheckAndAdjust(startDate);
-
-            startPeriod = startDate.ToString("yyy-MM-dd");
-            endPeriod = endDate.ToString("yyyy-MM-dd");
-            using (var client = new HttpClient()) {
-
-                string url = $"{EntryPointUrl}?startPeriod={startPeriod}&endPeriod={endPeriod}&format=jsondata&detail=dataonly";
-                var response = await client.GetAsync(url);
-                var result = await response.Content.ReadAsStringAsync();
-                // interface/class for json data?
-                //Observation observation = JsonConvert.DeserializeObject<Observation>(result);
-                var json = JsonConvert.DeserializeObject<CurrencyData>(result);
-                Console.WriteLine(json);
-                Observation observation = null;
-                return observation;
-            }
+        public async Task<IEnumerable<Observation>> GetRates(DateTime startDate, DateTime endDate) {
+                // todo return range
+                return [];
         }
 
         public DateTime WeekDayCheckAndAdjust(DateTime date) {
@@ -101,20 +72,29 @@ namespace Fx_converter.Services.DataCollector
 			}
         }
         private Observation ObservationObjectBuilder(CurrencyData data) {
-            
-			foreach (var item in data.Structure.Dimensions.Observation) {
-                foreach(var value in  item.Values) {
-					Console.WriteLine(value.Id);
+            Observation observation = new Observation();
+     
+            int observations = data.Structure.Dimensions.Observation.Length;
+            int dataSeries = data.DataSets[0].Series.Count;
+
+            for (int i = 0; i<observations; i++) {
+                for (int j = 0; j<dataSeries; j++) {
+					// check needed, data not always uniform -> some observations/values missing mostly going over from 2022 to 2023
+					// e.g. 2022-12-28 to 2023-01-05
+                    // todo condition
+                    string symbol = data.Structure.Dimensions.Series[1].Values[j].Id;
+					double rate = data.DataSets[0].Series[$"0:{j}:0:0:0"].Observations[i.ToString()][0];
+                    CurrencyRate currencyRate = new CurrencyRate()
+                    {
+                        Currency = GetOrCreateCurrency(symbol),
+                        Rate = rate, 
+                    };
+                    string isoDate = data.Structure.Dimensions.Observation[0].Values[i].Id.ToString("yyyy-MM-dd");
+                    observation.Date = isoDate;
+                    observation.CurrencyRates.Add(currencyRate);
 				}
-                
-            }
-            Console.WriteLine(data.DataSets[0].Series);
-            foreach (var item in data.DataSets) {
-                foreach(var observation in item.Series["0:0:0:0:0"].Observations) {
-                    Console.WriteLine(observation.Value);
-                }
-            }
-            return new Observation();
+			}
+            return observation;
         }
     }
 

@@ -1,5 +1,4 @@
-﻿using DocumentFormat.OpenXml.Drawing.Charts;
-using Fx_converter.Entities;
+﻿using Fx_converter.Entities;
 using Fx_converter.Models;
 using Newtonsoft.Json;
 
@@ -28,27 +27,25 @@ namespace Fx_converter.Services.DataCollector
             using (var client = _httpClient.CreateClient()) {
 
                 string url = $"{EntryPointUrl}?startPeriod={startPeriod}&endPeriod={endPeriod}&format=jsondata&detail=dataonly";
-                /*    var response = await client.GetAsync(url);
-                    response.EnsureSuccessStatusCode();
-                    var result = await response.Content.ReadAsStringAsync();
-                    // interface/class for json data?
-                    //Observation observation = JsonConvert.DeserializeObject<Observation>(result);
-                    var json = JsonConvert.DeserializeObject<CurrencyData>(result);*/
-                // dummy obj
-                // in method
-                        List<Currency> currencies = _context.Currencies.ToList();
-                        Currency currency = currencies.FirstOrDefault(c => c.Symbol == "USD");
-                        if (currency == null) {
-                            currency = new Currency() { Symbol = "USD" };
-                        }
+                var response = await client.GetAsync(url);
+                response.EnsureSuccessStatusCode();
+                var result = await response.Content.ReadAsStringAsync();
+                // interface/class for json data?
+                //Observation observation = JsonConvert.DeserializeObject<Observation>(result);
+                var data = JsonConvert.DeserializeObject<CurrencyData>(result);
+           
+
+                Currency currency = GetOrCreateCurrency("USD");
                 //
-				Observation observation = new Observation();
+		/*		Observation observation = new Observation();
                 observation.Date = "2023-12-19";
                 observation.CurrencyRates = new List<CurrencyRate> {
                     new CurrencyRate { 
                         Currency = currency,
                         Rate = 1.0044, },
-                    };
+                    };*/
+
+                Observation observation = ObservationObjectBuilder(data);
                 return observation;
             }
         }
@@ -93,7 +90,32 @@ namespace Fx_converter.Services.DataCollector
 
             return timeDiff.TotalMilliseconds > DAY_IN_MILLISECONDS;
         }
-
+        private Currency GetOrCreateCurrency(string symbol) {
+			List<Currency> currencies = _context.Currencies.ToList();
+			Currency? currency = currencies.FirstOrDefault(c => c.Symbol == symbol);
+          
+			if (currency == null) {
+				return currency = new Currency() { Symbol = symbol };
+			} else {
+				return currency;
+			}
+        }
+        private Observation ObservationObjectBuilder(CurrencyData data) {
+            
+			foreach (var item in data.Structure.Dimensions.Observation) {
+                foreach(var value in  item.Values) {
+					Console.WriteLine(value.Id);
+				}
+                
+            }
+            Console.WriteLine(data.DataSets[0].Series);
+            foreach (var item in data.DataSets) {
+                foreach(var observation in item.Series["0:0:0:0:0"].Observations) {
+                    Console.WriteLine(observation.Value);
+                }
+            }
+            return new Observation();
+        }
     }
 
 }

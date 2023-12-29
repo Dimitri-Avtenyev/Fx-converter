@@ -22,7 +22,12 @@ namespace Fx_converter
 			var PSW = Environment.GetEnvironmentVariable("PSW");
 			var connectionString = $"Server=tcp:fxconverterdb-server.database.windows.net,1433;Initial Catalog=FxConverterDB;Persist Security Info=False;User ID={USER};Password={PSW};MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;";
 			services.AddDbContext<FxDbContext>(options => {
-				options.UseSqlServer(connectionString);
+				options.UseSqlServer(connectionString, sqlServerOptionsAction: sqlOptions => {
+					sqlOptions.EnableRetryOnFailure(
+						maxRetryCount: 3,  
+						maxRetryDelay: TimeSpan.FromSeconds(30),
+						errorNumbersToAdd: null); 
+				});
 			});
 	   
 		}

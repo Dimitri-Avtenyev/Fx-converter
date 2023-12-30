@@ -37,7 +37,17 @@ namespace Fx_converter
             }
             return observation;
         }
+        public async Task<CurrencyRate> GetAsyncCurrencyRate(DateTime date, string symbol) {
+			date = DateHelper.WeekDayCheckAndAdjust(date);
+			CurrencyRate? currencyRate = _context.CurrencyRates
+                .FirstOrDefault(cr => cr.Observation.Date == date.ToString("yyyy-MM-dd") && cr.Currency.Symbol == symbol);
+            if (currencyRate == null) {
+                var observation = await _dataCollector.GetRates(date);
+				Add(observation);
+			}
 
+            return currencyRate;
+        }
         public IEnumerable<Observation> GetAll() {
             return _context.Observations;
         }

@@ -40,8 +40,9 @@ namespace Fx_converter.Services.ExcelProcessor
 						if(symbol == "EUR") {
 							currentRow.Cell(newCols[0]).Value = 1;
 						} else {
-							var observation = await _fxDataRepository.GetAsync(invoiceDate);
-							var currencyRate = observation.CurrencyRates.FirstOrDefault(currencyRate => currencyRate.Currency.Symbol == symbol);
+							/*var observation = await _fxDataRepository.GetAsync(invoiceDate);
+							var currencyRate = observation.CurrencyRates.FirstOrDefault(currencyRate => currencyRate.Currency.Symbol == symbol);*/
+							var currencyRate = await _fxDataRepository.GetAsyncCurrencyRate(invoiceDate, symbol);
 							currentRow.Cell(newCols[0]).Value = currencyRate.Rate;
 						}
 					} 

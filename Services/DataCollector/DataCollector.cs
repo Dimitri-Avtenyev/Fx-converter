@@ -1,5 +1,6 @@
 ﻿using Fx_converter.Entities;
 using Fx_converter.Models;
+using Fx_converter.Utilities;
 using Newtonsoft.Json;
 
 
@@ -14,13 +15,11 @@ namespace Fx_converter.Services.DataCollector
         private readonly IHttpClientFactory _httpClient;
         private readonly FxDbContext _context;
         public string EntryPointUrl { get; set; } = "https://data-api.ecb.europa.eu/service/data/EXR/D..EUR.SP00.A";
-        public Observation Observation { get; set; }
- 
        
         public async Task<Observation> GetRates(DateTime startDate) {
             string startPeriod = string.Empty;
             string endPeriod = string.Empty;
-            startDate = this.WeekDayCheckAndAdjust(startDate);
+            startDate = DateHelper.WeekDayCheckAndAdjust(startDate);
 
             startPeriod = startDate.ToString("yyyy-MM-dd");
             endPeriod = startDate.ToString("yyyy-MM-dd");
@@ -41,28 +40,7 @@ namespace Fx_converter.Services.DataCollector
                 return [];
         }
 
-        public DateTime WeekDayCheckAndAdjust(DateTime date) {
-    
-            DayOfWeek dayOfWeek = date.DayOfWeek;
-            if(this.AtLeastOneDayOlder(date)) {
-                Console.WriteLine($"{date} is too recent(needs to be at least one day older), no data yet, adjusting...");
-            }
-            if (dayOfWeek == DayOfWeek.Sunday) {
-                date = date.AddDays(-2);
-            } else if (dayOfWeek == DayOfWeek.Saturday) {
-                date = date.AddDays(-1);
-            }
-            return date;
-        }
-        public bool AtLeastOneDayOlder(DateTime date) {
-            DateTime today = DateTime.Now;
-            TimeSpan timeDiff = today - date;
-            const int DAY_IN_MILLISECONDS = 24 * 60 * 60 * 1000;
-
-            return timeDiff.TotalMilliseconds > DAY_IN_MILLISECONDS;
-        }
-        private Currency GetOrCreateCurrency(string symbol) {
-			List<Currency> currencies = _context.Currencies.ToList();
+        private Currency GetOrCreateCurrency(string symbol, List<Currency> currencies) {
 			Currency? currency = currencies.FirstOrDefault(c => c.Symbol == symbol);
           
 			if (currency == null) {
@@ -76,17 +54,15 @@ namespace Fx_converter.Services.DataCollector
      
             int observations = data.Structure.Dimensions.Observation.Length;
             int dataSeries = data.DataSets[0].Series.Count;
+			List<Currency> currencies = _context.Currencies.ToList();
 
-            for (int i = 0; i<observations; i++) {
+			for (int i = 0; i<observations; i++) {
                 for (int j = 0; j<dataSeries; j++) {
-					// check needed, data not always uniform -> some observations/values missing mostly going over from 2022 to 2023
-					// e.g. 2022-12-28 to 2023-01-05
-                    // todo condition
                     string symbol = data.Structure.Dimensions.Series[1].Values[j].Id;
 					double rate = data.DataSets[0].Series[$"0:{j}:0:0:0"].Observations[i.ToString()][0];
                     CurrencyRate currencyRate = new CurrencyRate()
                     {
-                        Currency = GetOrCreateCurrency(symbol),
+                        Currency = GetOrCreateCurrency(symbol, currencies),
                         Rate = rate, 
                     };
                     string isoDate = data.Structure.Dimensions.Observation[0].Values[i].Id.ToString("yyyy-MM-dd");

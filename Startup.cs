@@ -29,11 +29,10 @@ namespace Fx_converter
 						errorNumbersToAdd: null); 
 				});
 			});
-	   
 		}
-
-		public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+		public void Configure(IApplicationBuilder app, IWebHostEnvironment env, FxDbContext context)
 		{
+			PopulateDb(context);
 			if (env.IsDevelopment()) {
 
 				app.UseDeveloperExceptionPage();
@@ -53,7 +52,9 @@ namespace Fx_converter
 				endpoints.MapControllers();
 			});
 		}
-
+		private void PopulateDb (FxDbContext context) {
+			
+		}
 
 	}
 }

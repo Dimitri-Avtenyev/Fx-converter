@@ -1,7 +1,10 @@
 using Fx_converter.Entities;
 using Fx_converter.Models;
 using Fx_converter.Services.DataCollector;
+using Fx_converter.Utilities;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
+using System.Data.Common;
 
 namespace Fx_converter
 {
@@ -14,12 +17,16 @@ namespace Fx_converter
 		private readonly FxDbContext _context;
         private readonly IDataCollector _dataCollector;
 		public void Add(Observation observation) {
-			// logic to handle before adding -> unique currencies and observation dates -> index with constraint
 			// msg 2601 for duplicates
 			_context.Observations.Add(observation);
-            _context.SaveChanges();
+			try {
+				_context.SaveChanges();
+			} catch (SqlException ex) {
+                Console.WriteLine(ex.Message);
+            }
         }
         public async Task<Observation> GetAsync(DateTime date) {
+            date = DateHelper.WeekDayCheckAndAdjust(date);
             var observation = _context.Observations
                 .Include(o => o.CurrencyRates)
                 .ThenInclude(cr => cr.Currency)

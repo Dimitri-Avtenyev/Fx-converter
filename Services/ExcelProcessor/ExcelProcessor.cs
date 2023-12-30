@@ -1,5 +1,7 @@
 ﻿
 using ClosedXML.Excel;
+using Fx_converter.Models;
+using System.Globalization;
 
 namespace Fx_converter.Services.ExcelProcessor
 {
@@ -42,7 +44,7 @@ namespace Fx_converter.Services.ExcelProcessor
 							var currencyRate = observation.CurrencyRates.FirstOrDefault(currencyRate => currencyRate.Currency.Symbol == symbol);
 							currentRow.Cell(newCols[0]).Value = currencyRate.Rate;
 						}
-					}
+					} 
 				}
             }
 		}

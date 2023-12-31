@@ -25,7 +25,7 @@ namespace Fx_converter
 				options.UseSqlServer(connectionString, sqlServerOptionsAction: sqlOptions => {
 					sqlOptions.EnableRetryOnFailure(
 						maxRetryCount: 3,  
-						maxRetryDelay: TimeSpan.FromSeconds(30),
+						maxRetryDelay: TimeSpan.FromSeconds(60),
 						errorNumbersToAdd: null); 
 				});
 			});

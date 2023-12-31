@@ -6,7 +6,6 @@
 	  <InvariantGlobalization>false</InvariantGlobalization>
     <ImplicitUsings>enable</ImplicitUsings>
     <RootNamespace>Fx_converter</RootNamespace>
-    <UserSecretsId>e8f94ee5-b32c-4d5f-ae47-d054e9db1a20</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>

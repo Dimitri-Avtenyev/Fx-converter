@@ -16,6 +16,18 @@ namespace Fx_converter
         }
 		private readonly FxDbContext _context;
         private readonly IDataCollector _dataCollector;
+        private IEnumerable<CurrencyRate> _tempCurrencyRates;
+        public IEnumerable<CurrencyRate> TempCurrencyRates {
+            get {
+                if ( _tempCurrencyRates == null ) {
+                    return new List<CurrencyRate>();
+                }
+                return _tempCurrencyRates.ToList();
+            }
+            set {
+                _tempCurrencyRates = value;
+            }
+        }
 		public void Add(Observation observation) {
 			// msg 2601 for duplicates
 			_context.Observations.Add(observation);

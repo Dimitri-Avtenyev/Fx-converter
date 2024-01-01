@@ -1,5 +1,6 @@
 ﻿
 using ClosedXML.Excel;
+using DocumentFormat.OpenXml.Drawing.Charts;
 using Fx_converter.Models;
 using System.Globalization;
 
@@ -29,7 +30,7 @@ namespace Fx_converter.Services.ExcelProcessor
 			}
 		}
 		public async Task AddData(IXLWorksheet worksheet, string columnCurrency, int[] newCols) {
-
+			var getCurrencyRateTasks = new List<Task>();
 			foreach (var currencyCell in worksheet.Column(columnCurrency).CellsUsed()) {
 				var currentRow = currencyCell.WorksheetRow();
 
@@ -40,14 +41,18 @@ namespace Fx_converter.Services.ExcelProcessor
 						if(symbol == "EUR") {
 							currentRow.Cell(newCols[0]).Value = 1;
 						} else {
-							/*var observation = await _fxDataRepository.GetAsync(invoiceDate);
-							var currencyRate = observation.CurrencyRates.FirstOrDefault(currencyRate => currencyRate.Currency.Symbol == symbol);*/
-							var currencyRate = await _fxDataRepository.GetAsyncCurrencyRate(invoiceDate, symbol);
-							currentRow.Cell(newCols[0]).Value = currencyRate.Rate;
+							/*var currencyRate = await _fxDataRepository.GetAsyncCurrencyRate(invoiceDate, symbol);
+							currentRow.Cell(newCols[0]).Value = currencyRate.Rate;*/
+							getCurrencyRateTasks.Add(UpdateCellValueAsync(currentRow, newCols, invoiceDate, symbol));
 						}
 					} 
 				}
             }
+			await Task.WhenAll(getCurrencyRateTasks);
+		}
+		private async Task UpdateCellValueAsync(IXLRow currentRow, int[] newCols , DateTime invoiceDate, string symbol) {
+			var currencyRate = await _fxDataRepository.GetAsyncCurrencyRate(invoiceDate, symbol);
+			currentRow.Cell(newCols[0]).Value = currencyRate.Rate;
 		}
 		public string? FindColumnWithCurrency(IXLWorksheet worksheet) {
 			string? currencyColumn = null;

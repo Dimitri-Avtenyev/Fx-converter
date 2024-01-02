@@ -10,5 +10,5 @@ namespace Fx_converter
         void Add(Observation observation);
         Task Update(Observation observation);
         void Remove(Observation observation);
-    }
+	}
 }

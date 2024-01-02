@@ -1,8 +1,5 @@
 ﻿
 using ClosedXML.Excel;
-using DocumentFormat.OpenXml.Drawing.Charts;
-using Fx_converter.Models;
-using System.Globalization;
 
 namespace Fx_converter.Services.ExcelProcessor
 {

@@ -1,10 +1,11 @@
 # Foreign Exchange Converter
 
+## Introduction
+This project is a .NET remake of the [GrantThornton FX Converter](https://github.com/Dimitri-Avtenyev/GrantThornton-FX-converter). Work in progress.
+It is being developed for learning purposes and to explore .NET development.
+
+
 .NET project that serves as a Foreign Exchange Converter, focusing on currency exchange rates in relation to EUR. The application utilizes Entity Framework  for data management with SQL Server hosted on Azure.
-
-
-<img width="400" alt="Screenshot 2023-12-29 at 15 54 40" src="https://github.com/Dimitri-Avtenyev/Fx-converter/assets/102914455/6be1b364-61d8-4226-8bc7-5ce3b823065e">
-
 
 ## Features
 
